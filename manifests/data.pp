@@ -3,9 +3,8 @@
 # Poorly named 'params' class, this class handles all the os-specific logic.
 #
 class stunnel::data {
-  case $::osfamily {
+  case $facts['os']['family'] {
     /RedHat/: {
-      $package = [ 'stunnel', 'redhat-lsb' ]
       $service = 'stunnel'
       $bin_name = 'stunnel'
       $bin_path = '/usr/bin'
@@ -17,11 +16,18 @@ class stunnel::data {
       $setgid = 'root'
       $setuid = 'root'
 
-      if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
+      if versioncmp($facts['os']['release']['major'], '7') >= 0 {
         $service_init_system = 'systemd'
       } else {
         $service_init_system = 'sysv'
       }
+
+      if versioncmp($facts['os']['release']['major'], '9') >= 0 {
+        $package = [ 'stunnel' ]
+      } else {
+        $package = [ 'stunnel', 'redhat-lsb' ]
+      }
+
     }
     /Debian/: {
       $package = [ 'stunnel4', 'lsb-base' ]
@@ -36,8 +42,8 @@ class stunnel::data {
       $setgid = 'root'
       $setuid = 'root'
 
-      if ($::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemrelease, '15.04') >= 0) or
-         ($::operatingsystem == 'Debian' and versioncmp($::operatingsystemrelease, '8.0') >= 0) {
+      if ($facts['os']['name'] == 'Ubuntu' and versioncmp($facts['os']['release']['full'], '15.04') >= 0) or
+        ($facts['os']['name'] == 'Debian' and versioncmp($facts['os']['release']['full'], '8.0') >= 0) {
         $service_init_system = 'systemd'
       } else {
         $service_init_system = 'sysv'
@@ -45,7 +51,7 @@ class stunnel::data {
     }
 
     default: {
-      fail("Unsupported osfamily '${::osfamily}'!")
+      fail("Unsupported osfamily '${facts['os']['family']}'!")
     }
   }
 }
