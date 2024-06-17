@@ -68,8 +68,8 @@ define stunnel::tun (
   $connect,
   $cafile = '',
   $cert = 'UNSET',
-  $client = false,
-  $options = [ ],
+  Boolean $client = false,
+  $options = [],
   $failover = 'rr',
   $template = 'stunnel/tun.erb',
   $timeoutidle = '43200',
@@ -78,15 +78,13 @@ define stunnel::tun (
   $service_ensure = 'running',
   $service_init_system = 'UNSET',
   $output = 'UNSET',
-  $global_opts = { },
-  $service_opts = { },
+  Hash $global_opts = {},
+  Hash $service_opts = {},
   $ensure = 'present',
 ) {
   require stunnel
   include stunnel::data
 
-  validate_hash( $global_opts )
-  validate_hash( $service_opts )
   validate_re( $failover, '^(rr|prio)$', '$failover must be either \'rr\' or \'prio\'')
   validate_re( $ensure, '^(absent|present)$', '$ensure must be either \'absent\' or \'present\'')
 
@@ -113,10 +111,8 @@ define stunnel::tun (
   if $cert_real != '' {
     validate_absolute_path( $cert_real )
   }
-  validate_bool( str2bool($client) )
-
   if is_string($options) {
-    $options_r = [ $options ]
+    $options_r = [$options]
   } elsif is_array($options) {
     $options_r = $options
   } else {
@@ -124,15 +120,15 @@ define stunnel::tun (
   }
 
   $service_init_system_real = $service_init_system ? {
-    'UNSET' => $::stunnel::data::service_init_system,
+    'UNSET' => $stunnel::data::service_init_system,
     default => $service_init_system,
   }
   validate_re( $service_init_system_real, '^(sysv|systemd)$',
-    '$service_init_system must be either \'sysv\' or \'systemd\'')
+  '$service_init_system must be either \'sysv\' or \'systemd\'')
 
   $pid = "${stunnel::data::pid_dir}/stunnel-${name}.pid"
   $output_r = $output ? {
-    'UNSET' => "${::stunnel::data::log_dir}/${name}.log",
+    'UNSET' => "${stunnel::data::log_dir}/${name}.log",
     default => $output,
   }
   validate_absolute_path($output_r)
