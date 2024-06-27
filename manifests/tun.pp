@@ -81,6 +81,8 @@ define stunnel::tun (
   Hash $global_opts = {},
   Hash $service_opts = {},
   $ensure = 'present',
+  Integer[1] $systemd_auto_restart_seconds = 5,
+  Integer[-1000,1000] $oom_score_adj = -300,
 ) {
   require stunnel
   include stunnel::data
@@ -161,8 +163,6 @@ define stunnel::tun (
       content => template('stunnel/stunnel.init.erb'),
     }
   } elsif $service_init_system_real == 'systemd' {
-    $systemd_auto_restart_seconds = 5
-    $oom_score_adj = -300
     $initscript_file = "/etc/systemd/system/stunnel-${name}.service"
     file { $initscript_file:
       ensure  => $initscript_ensure,
