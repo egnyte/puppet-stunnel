@@ -81,6 +81,8 @@ define stunnel::tun (
   Hash $global_opts = {},
   Hash $service_opts = {},
   $ensure = 'present',
+  Integer[1] $systemd_auto_restart_seconds = 5,
+  Integer[-1000,1000] $oom_score_adj = -300,
 ) {
   require stunnel
   include stunnel::data
