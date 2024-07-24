@@ -11,8 +11,8 @@ ExecStart=<%= @svc_bin %> <%= @config_file %>
 KillMode=process
 TimeoutStopSec=2
 Restart=on-failure
-RestartSec="<%= $systemd_auto_restart_seconds %>s"
-OOMScoreAdjust=<%= $oom_score_adj %>
+RestartSec=<%= @systemd_auto_restart_seconds %>s
+OOMScoreAdjust=<%= @oom_score_adj %>
 
 [Install]
 WantedBy=multi-user.target
